@@ -9,6 +9,13 @@ workflows:
             branches:
               only:
                 - main
+      - deploy:
+          filters:
+            branches:
+              only:
+                - main
+          requires:
+            - build
 
 jobs:
   build:
@@ -17,9 +24,9 @@ jobs:
       - image: circleci/node:16.13.2
     steps:
       - checkout
-      - run: 
+      - run:
           name: update-npm
-          command: 'sudo npm install -g npm@5'
+          command: "sudo npm install -g npm@5"
       - restore_cache:
           key: dependency-cache-{{ checksum "package-lock.json" }}
       - run:
@@ -29,3 +36,11 @@ jobs:
           key: dependency-cache-{{ checksum "package-lock.json" }}
           paths:
             - ./node_modules
+  deploy:
+    docker:
+      - image: circleci/node:16.13.2
+    steps:
+      - run:
+          name: deploy-application
+          command: ssh -o StrictHostKeyChecking=no $EC2_USERNAME@EC2_PUBLIC_DNS "rm -rf SimpleApplication/; git clone https://github.com/Danod12/SimpleApplication.git
+          source SimpleApplication/deploy.sh "
