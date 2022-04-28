@@ -9,13 +9,21 @@ workflows:
             branches:
               only:
                 - main
+
+      - hold:
+          type: approval
+          requires:
+            - build
+
       - deploy:
           filters:
             branches:
               only:
                 - main
           requires:
-            - build
+              - hold
+
+
 
 jobs:
   build:
