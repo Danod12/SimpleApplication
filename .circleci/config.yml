@@ -13,6 +13,7 @@ workflows:
       - hold:
           type: approval
           requires:
+            - build
 
       - deploy:
           filters:
